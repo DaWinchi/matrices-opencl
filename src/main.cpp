@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <CL/cl.hpp>
 
 const int NROWS1 = 1000;
 const int NCOLS1 = 1000;
@@ -64,5 +65,27 @@ int main (int argc, char **argv)
 {
     srand(time(NULL));
     ComputingOnHost();
+
+    std::cout<<std::endl<<"-----------------Devices-----------------\n";
+    std::vector<cl::Platform> platforms;
+    cl::Platform::get(&platforms);
+    for (int i = 0; i < platforms.size(); i++)
+    {
+        std::cout<<"["<<i<<"]"<<" "<< platforms[i].getInfo<CL_PLATFORM_NAME>()<<std::endl;
+        std::cout<<"\tVendor: "<<platforms[i].getInfo<CL_PLATFORM_VENDOR>()<<std::endl;
+        std::cout<<"\tVersion: "<<platforms[i].getInfo<CL_PLATFORM_VERSION>()<<std::endl;
+    }
+
+    std::cout<<"Choose platform...";
+    int nPlat = 0;
+    std::cin>>nPlat;
+    std::cout<<std::endl;
+    std::vector<cl::Device> devices;
+    platforms[nPlat].getDevices(CL_DEVICE_TYPE_ALL, &devices);
+    for (int i = 0; i < devices.size(); i++)
+    {
+        std::cout<<"["<<i<<"]"<<" "<< devices[i].getInfo<CL_DEVICE_NAME>()<<std::endl;
+    }
+
     return 0;
 }
