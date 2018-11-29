@@ -7,13 +7,38 @@ const int NCOLS1 = 1000;
 const int NROWS2 = 1000;
 const int NCOLS2 = 1000;
 
-int matrix1 [NROWS1][NCOLS1];
-int matrix2 [NROWS2][NCOLS2];
-int matrixResultCPU [NROWS1][NCOLS2];
-int matrixResultGPU [NROWS1][NCOLS2];
+int **matrix1;
+int **matrix2;
+int **matrixResultCPU;
+int **matrixResultGPU;
 
 void InitializeData()
 {   
+    matrix1 = new int* [NROWS1];
+    for (int i = 0; i< NROWS1; i++ )
+    { 
+        matrix1[i] = new int [NCOLS1];
+    }  
+
+    matrix2 = new int* [NROWS2];
+    for (int i = 0; i< NROWS2; i++ )
+    { 
+        matrix2[i] = new int [NCOLS2];
+    } 
+
+    matrixResultCPU = new int* [NROWS1];
+    for (int i = 0; i< NROWS1; i++ )
+    { 
+        matrixResultCPU[i] = new int [NCOLS2];
+    }  
+
+    matrixResultGPU = new int* [NROWS1];
+    for (int i = 0; i< NROWS1; i++ )
+    { 
+        matrixResultGPU[i] = new int [NCOLS2];
+    }    
+    
+
     /*Initialize matrix 1*/
     for (int i = 0; i< NROWS1; i++ )
     {
@@ -29,6 +54,16 @@ void InitializeData()
         for (int j = 0; j< NCOLS2; j++ )
         {
             matrix2[i][j] = rand() % 101;
+        }  
+    }
+
+    /*Initialize matrix GPU CPU*/
+    for (int i = 0; i< NROWS1; i++ )
+    {
+        for (int j = 0; j< NCOLS2; j++ )
+        {
+            matrixResultGPU[i][j] = 0;
+            matrixResultCPU[i][j] = 0;
         }  
     }
 }
@@ -64,10 +99,16 @@ void ComputingOnHost()
 int main (int argc, char **argv)
 {
     srand(time(NULL));
-    //ComputingOnHost();
+    InitializeData();
+    ComputingOnHost();
 
     Computing computer;
-    computer.getDevicesInfo();    
+    computer.getDevicesInfo();
+
+    computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
+    //computer.matrix1 = &matrix1;
+    computer.compute(0);    
+
 
     return 0;
 }
