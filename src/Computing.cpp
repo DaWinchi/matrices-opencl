@@ -95,4 +95,28 @@ void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult,
 
 }
 
+void Computing::printData()
+{
+    std::cout<<std::endl<<"Matrix 1:\n";
+    for (int i = 0; i < sizeM1.r*sizeM1.c; i++ )
+    {
+        printf("%3i", matrix1[i]);
+        if(i % sizeM1.c == (sizeM1.c-1))
+        {
+            std::cout<<std::endl;
+        }
+    }
+
+    std::cout<<std::endl<<"Matrix 2:\n";
+    for (int i = 0; i < sizeM2.r*sizeM2.c; i++ )
+    {
+        printf("%3i", matrix2[i]);
+        if(i % sizeM2.c == (sizeM2.c-1))
+        {
+            std::cout<<std::endl;
+        }
+    }
+
+}
+
 Computing::~Computing(){}

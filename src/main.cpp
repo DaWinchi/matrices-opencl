@@ -2,10 +2,10 @@
 #include <ctime>
 #include <iostream>
 
-const int NROWS1 = 1000;
-const int NCOLS1 = 1000;
-const int NROWS2 = 1000;
-const int NCOLS2 = 1000;
+const int NROWS1 = 10;
+const int NCOLS1 = 5;
+const int NROWS2 = 5;
+const int NCOLS2 = 20;
 
 int **matrix1;
 int **matrix2;
@@ -44,7 +44,7 @@ void InitializeData()
     {
         for (int j = 0; j< NCOLS1; j++ )
         { 
-            matrix1[i][j] = rand() % 101;
+            matrix1[i][j] = rand() % 100;
         }  
     }
 
@@ -53,7 +53,7 @@ void InitializeData()
     {
         for (int j = 0; j< NCOLS2; j++ )
         {
-            matrix2[i][j] = rand() % 101;
+            matrix2[i][j] = rand() % 100;
         }  
     }
 
@@ -100,13 +100,14 @@ int main (int argc, char **argv)
 {
     srand(time(NULL));
     InitializeData();
-    ComputingOnHost();
+    //ComputingOnHost();
 
+   
     Computing computer;
     computer.getDevicesInfo();
 
     computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
-    //computer.matrix1 = &matrix1;
+    computer.printData();
     computer.compute(0);    
 
 
