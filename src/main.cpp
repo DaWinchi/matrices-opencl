@@ -2,10 +2,10 @@
 #include <ctime>
 #include <iostream>
 
-const int NROWS1 = 3;
-const int NCOLS1 = 3;
-const int NROWS2 = 3;
-const int NCOLS2 = 3;
+const int NROWS1 = 2000;
+const int NCOLS1 = 2000;
+const int NROWS2 = 2000;
+const int NCOLS2 = 2000;
 
 int **matrix1;
 int **matrix2;
@@ -109,21 +109,37 @@ void ComputingOnHost()
 
 }
 
+void CheckDifference()
+{
+    int diff = 0;
+    for (int r = 0; r < NROWS1; r++)
+    {
+        for (int c = 0; c < NCOLS2; c++)
+        {
+            diff+=std::abs(matrixResultCPU[r][c]-matrixResultGPU[r][c]);
+        }
+    }
+    std::cout<<std::endl<<"Matrix difference: "<< diff<<std::endl;
+}
+
 int main (int argc, char **argv)
 {
     srand(time(NULL));
     InitializeData();
     Computing computer;
     computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
-    computer.printData();
+    //computer.printData();
 
     ComputingOnHost();
-    printResult();
+    //printResult();
    
     computer.getDevicesInfo();    
-    computer.compute(0);    
-    computer.printResult();
+    computer.compute(2);    
+    //computer.printResult();
 
+    delete [] matrixResultGPU;
+    matrixResultGPU = computer.getResult();
+    CheckDifference();
 
     return 0;
 }

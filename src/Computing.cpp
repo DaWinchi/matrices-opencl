@@ -89,21 +89,24 @@ void Computing::compute(int numDevice)
     cl::Kernel kernel(program, "compute");
 
     kernel.setArg(0, sizeM1.c);
-    kernel.setArg(1, vector1);
-    kernel.setArg(2, vector2);
-    kernel.setArg(3, vectorOut);
+    kernel.setArg(1, sizeRes.r);
+    kernel.setArg(2, sizeRes.c);
+    kernel.setArg(3, vector1);
+    kernel.setArg(4, vector2);
+    kernel.setArg(5, vectorOut);
 
     clock_t startTime = 0, endTime = 0;
     std::cout<<"Computing..............";
-
     startTime = clock();
     comqueque.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sizeRes.r, sizeRes.c));
+    comqueque.flush();
     endTime = clock();
 
     std::cout<<"OK\n";
+     
     double time = (double)(endTime - startTime)/CLOCKS_PER_SEC*1000;
     std::cout<<"Time: "<<time<<" ms"<<std::endl;
-    
+
     comqueque.enqueueReadBuffer(vectorOut, CL_TRUE, 0, sizeRes.r*sizeRes.c*sizeof(int),matrixResult);
 }
 
@@ -176,12 +179,30 @@ void Computing::printResult()
     std::cout<<std::endl<<"Result:\n";
     for (int i = 0; i < sizeRes.r*sizeRes.c; i++ )
     {
-        printf("%6i", matrixResult[i]);
-        if(i % sizeM1.c == (sizeRes.c-1))
+        printf("%5i", matrixResult[i]);
+        if(i % sizeRes.c == (sizeRes.c-1))
         {
             std::cout<<std::endl;
         }
     }
+}
+
+int ** Computing::getResult()
+{
+    int **result = new int*[sizeRes.r];
+    for (int r = 0; r < sizeRes.r; r++)
+    {
+        result[r] = new int [sizeRes.c];
+    }
+
+    for (int r = 0; r < sizeRes.r; r++)
+    {
+        for (int c = 0; c < sizeRes.c; c++)
+        {
+            result[r][c] = matrixResult[r*sizeRes.c + c];
+        }
+    }
+    return result;
 }
 
 Computing::~Computing(){}
