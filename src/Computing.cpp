@@ -51,6 +51,8 @@ void Computing::compute(int numDevice)
         std::cout<<"Error: Data is null\n";
         return;
     }
+
+    std::cout<<"Device: "<<devices[numDevice].getInfo<CL_DEVICE_NAME>()<<std::endl;
     std::vector<cl::Device> device = {devices[numDevice]};
 
     cl::Context context(device);

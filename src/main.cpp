@@ -2,10 +2,10 @@
 #include <ctime>
 #include <iostream>
 
-const int NROWS1 = 2000;
+const int NROWS1 = 3000;
 const int NCOLS1 = 2000;
 const int NROWS2 = 2000;
-const int NCOLS2 = 2000;
+const int NCOLS2 = 3000;
 
 int **matrix1;
 int **matrix2;
@@ -88,13 +88,15 @@ void ComputingOnHost()
 
     std::cout<<"Computing..............";
 
-    startTime = clock();  
-    for (int i = 0 ; i< NROWS1; i++)
+    startTime = clock(); 
+    int i=0, j=0, k=0;
+    #pragma omp parallel for shared(matrix1,matrix2,matrixResultCPU) private(i,j,k)
+    for (i = 0 ; i< NROWS1; i++)
     {        
-        for (int j = 0 ; j< NCOLS2; j++)
+        for (j = 0 ; j< NCOLS2; j++)
         {
             int sum = 0;
-            for (int k = 0; k < NCOLS1; k++)
+            for (k = 0; k < NCOLS1; k++)
             {
                 sum += matrix1[i][k]*matrix2[k][j];
             }
@@ -127,19 +129,21 @@ int main (int argc, char **argv)
     srand(time(NULL));
     InitializeData();
     Computing computer;
+    computer.getDevicesInfo();
     computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
     //computer.printData();
 
     ComputingOnHost();
-    //printResult();
-   
-    computer.getDevicesInfo();    
-    computer.compute(2);    
-    //computer.printResult();
+    //printResult();   
+    
+    for(int i =0; i<3; i++)
+    {    
+        computer.compute(i);    
+        //computer.printResult();
 
-    delete [] matrixResultGPU;
-    matrixResultGPU = computer.getResult();
-    CheckDifference();
-
+        delete [] matrixResultGPU;
+        matrixResultGPU = computer.getResult();
+        CheckDifference();
+    }
     return 0;
 }
