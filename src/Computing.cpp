@@ -1,5 +1,9 @@
+#define __CL_ENABLE_EXCEPTIONS
+
 #include "../inc/Computing.h"
 #include <iostream>
+#include <fstream>
+#include <ctime>
 
 Computing::Computing()
 {
@@ -47,12 +51,60 @@ void Computing::compute(int numDevice)
         std::cout<<"Error: Data is null\n";
         return;
     }
-    cl::Device device = devices[numDevice];
+    std::vector<cl::Device> device = {devices[numDevice]};
 
     cl::Context context(device);
-    cl::CommandQueue comqueque(context, device);
+    cl::CommandQueue comqueque(context,device[0]);
 
+    cl::Buffer vector1 = cl::Buffer(context, 
+                        CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
+                        (sizeM1.r*sizeM1.c) * sizeof(int), matrix1);
+	cl::Buffer vector2 = cl::Buffer(context,
+                        CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
+                        (sizeM2.r*sizeM2.c) * sizeof(int), matrix2);
+	cl::Buffer vectorOut = cl::Buffer(context, 
+                        CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
+                        (sizeRes.r*sizeRes.c) * sizeof(int), matrixResult);
+    
+	std::ifstream sourceFile("../src/kernel.cl");
+	std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
+	cl::Program::Sources source(1, std::make_pair(sourceCode.c_str(), sourceCode.length() + 1));
+	cl::Program program = cl::Program(context, source);
 
+    try
+    {
+        program.build(device);
+    }
+    catch(const cl::Error &err) 
+    {
+     // Выводим ошибки компиляции.
+        std::cerr
+        << "OpenCL compilation error" << std::endl
+        << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device[0])
+        << std::endl;
+        throw err;
+    }
+    
+
+    cl::Kernel kernel(program, "compute");
+
+    kernel.setArg(0, sizeM1.c);
+    kernel.setArg(1, vector1);
+    kernel.setArg(2, vector2);
+    kernel.setArg(3, vectorOut);
+
+    clock_t startTime = 0, endTime = 0;
+    std::cout<<"Computing..............";
+
+    startTime = clock();
+    comqueque.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sizeRes.r, sizeRes.c));
+    endTime = clock();
+
+    std::cout<<"OK\n";
+    double time = (double)(endTime - startTime)/CLOCKS_PER_SEC*1000;
+    std::cout<<"Time: "<<time<<" ms"<<std::endl;
+    
+    comqueque.enqueueReadBuffer(vectorOut, CL_TRUE, 0, sizeRes.r*sizeRes.c*sizeof(int),matrixResult);
 }
 
 void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult, 
@@ -117,6 +169,19 @@ void Computing::printData()
         }
     }
 
+}
+
+void Computing::printResult()
+{
+    std::cout<<std::endl<<"Result:\n";
+    for (int i = 0; i < sizeRes.r*sizeRes.c; i++ )
+    {
+        printf("%6i", matrixResult[i]);
+        if(i % sizeM1.c == (sizeRes.c-1))
+        {
+            std::cout<<std::endl;
+        }
+    }
 }
 
 Computing::~Computing(){}

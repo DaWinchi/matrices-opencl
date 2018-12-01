@@ -2,10 +2,10 @@
 #include <ctime>
 #include <iostream>
 
-const int NROWS1 = 10;
-const int NCOLS1 = 5;
-const int NROWS2 = 5;
-const int NCOLS2 = 20;
+const int NROWS1 = 3;
+const int NCOLS1 = 3;
+const int NROWS2 = 3;
+const int NCOLS2 = 3;
 
 int **matrix1;
 int **matrix2;
@@ -44,7 +44,7 @@ void InitializeData()
     {
         for (int j = 0; j< NCOLS1; j++ )
         { 
-            matrix1[i][j] = rand() % 100;
+            matrix1[i][j] = rand() % 10;
         }  
     }
 
@@ -53,7 +53,7 @@ void InitializeData()
     {
         for (int j = 0; j< NCOLS2; j++ )
         {
-            matrix2[i][j] = rand() % 100;
+            matrix2[i][j] = rand() % 10;
         }  
     }
 
@@ -65,6 +65,19 @@ void InitializeData()
             matrixResultGPU[i][j] = 0;
             matrixResultCPU[i][j] = 0;
         }  
+    }
+}
+
+void printResult()
+{
+    std::cout<<std::endl<<"Result:\n";
+    for (int i = 0; i < NROWS1; i++ )
+    {
+        for (int j =0; j < NCOLS2; j++)
+        {
+            printf("%6i", matrixResultCPU[i][j]);
+        }
+        std::cout<<std::endl;
     }
 }
 
@@ -100,15 +113,16 @@ int main (int argc, char **argv)
 {
     srand(time(NULL));
     InitializeData();
-    //ComputingOnHost();
-
-   
     Computing computer;
-    computer.getDevicesInfo();
-
     computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
     computer.printData();
+
+    ComputingOnHost();
+    printResult();
+   
+    computer.getDevicesInfo();    
     computer.compute(0);    
+    computer.printResult();
 
 
     return 0;
