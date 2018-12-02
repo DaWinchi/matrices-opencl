@@ -84,7 +84,7 @@ void Computing::compute(int numDevice)
         << "OpenCL compilation error" << std::endl
         << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device[0])
         << std::endl;
-        throw err;
+        //throw err;
     }
     
 

@@ -136,7 +136,7 @@ int main (int argc, char **argv)
     ComputingOnHost();
     //printResult();   
     
-    for(int i =0; i<3; i++)
+    for(int i =0; i<computer.devices.size(); i++)
     {    
         computer.compute(i);    
         //computer.printResult();
@@ -145,5 +145,6 @@ int main (int argc, char **argv)
         matrixResultGPU = computer.getResult();
         CheckDifference();
     }
+	system("pause");
     return 0;
 }
