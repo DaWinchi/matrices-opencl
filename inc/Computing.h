@@ -27,6 +27,7 @@ public:
 	std::vector<cl::Device> devices;
 private:
 	void setSubData(int **pMatr1, int **pMatrResult, int nRows1, int nCols1, int nRows2, int nCols2);
+	void setResultFromSubResult();
 	int _labelDevide;;
 	int *_matrix1;
 	int *_matrix2;

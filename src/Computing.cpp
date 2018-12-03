@@ -43,13 +43,16 @@ void Computing::getDevicesInfo()
         std::cout<<"System isn't has any OpenCL devices..\n";
         return;
     }
-    std::cout<<"----------------------------- Devices -----------------------------\n";
+    std::cout<<"----------------------------- OpenCL Devices -----------------------------\n";
+
+	int num = 0;
     for (cl::Device device : devices)
     {
-        std::cout<<"Name: "<<device.getInfo<CL_DEVICE_NAME>()<<std::endl;
+        std::cout<<"["<<num<<"]"<<"Name: "<<device.getInfo<CL_DEVICE_NAME>()<<std::endl;
         std::cout<<"Vendor: "<<device.getInfo<CL_DEVICE_VENDOR>()<<std::endl;
         std::cout<<"Version: "<<device.getInfo<CL_DEVICE_VERSION>()<<std::endl;
         std::cout<<std::endl;
+		num++;
     }
 }
 
@@ -231,6 +234,7 @@ void Computing::compute(int numDevice1, int numDevice2)
 
 	comqueque1.enqueueReadBuffer(vectorOutUp, CL_TRUE, 0, _sizeResultUp.r*_sizeResultUp.c * sizeof(int), _matrixResultUp);
 	comqueque2.enqueueReadBuffer(vectorOutDown, CL_TRUE, 0, _sizeResultDown.r*_sizeResultDown.c * sizeof(int), _matrixResultDown);
+	setResultFromSubResult();
 }
 
 void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult, 
@@ -242,6 +246,10 @@ void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult,
     sizeM2.c = nCols2;
     sizeRes.r = nRows1;
     sizeRes.c = nCols2;
+
+	delete[] _matrix1;
+	delete[] _matrix2;
+	delete[] _matrixResult;
 
     _matrix1 = new int [sizeM1.r*sizeM1.c];
     _matrix2 = new int [sizeM2.r*sizeM2.c];
@@ -288,6 +296,12 @@ void Computing::setSubData(int **pMatr1, int **pMatrResult,  int nRows1, int nCo
 	_sizeResultUp.c = nCols2;
 	_sizeResultDown.r = _sizeM1Down.r;
 	_sizeResultDown.c = nCols2;
+
+
+	delete[] _matrix1Up;
+	delete[] _matrix1Down;
+	delete[] _matrixResultUp;
+	delete[] _matrixResultDown;
 
 	_matrix1Up = new int[_sizeM1Up.r*_sizeM1Up.c];
 	_matrix1Down = new int[_sizeM1Down.r*_sizeM1Down.c];
@@ -377,6 +391,22 @@ void Computing::printData()
 
 }
 
+void Computing::setResultFromSubResult()
+{	
+	int i = 0;
+	for (i = 0; i < _sizeResultUp.c*_sizeResultUp.r; i++)
+	{
+		_matrixResult[i] = _matrixResultUp[i];
+	}
+
+	for (int j = 0; j < _sizeResultDown.c*_sizeResultDown.r; j++)
+	{
+		_matrixResult[i] = _matrixResultDown[j];
+		i++;
+	}
+
+}
+
 void Computing::printResult()
 {
     std::cout<<std::endl<<"Result:\n";
@@ -429,4 +459,13 @@ int ** Computing::getResult()
     return result;
 }
 
-Computing::~Computing(){}
+Computing::~Computing()
+{
+	delete[] _matrix1;
+	delete[] _matrix2;
+	delete[] _matrixResult;
+	delete[] _matrix1Up;
+	delete[] _matrix1Down;
+	delete[] _matrixResultUp;
+	delete[] _matrixResultDown;
+}
