@@ -2,10 +2,10 @@
 #include <ctime>
 #include <iostream>
 
-const int NROWS1 = 3000;
-const int NCOLS1 = 2000;
-const int NROWS2 = 2000;
-const int NCOLS2 = 3000;
+const int NROWS1 = 6;
+const int NCOLS1 = 6;
+const int NROWS2 = 6;
+const int NCOLS2 = 6;
 
 int **matrix1;
 int **matrix2;
@@ -130,21 +130,28 @@ int main (int argc, char **argv)
     InitializeData();
     Computing computer;
     computer.getDevicesInfo();
+	computer.setBarrier(3);
     computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
-    //computer.printData();
+    computer.printData();
 
     ComputingOnHost();
-    //printResult();   
+    printResult();   
     
-    for(int i =0; i<computer.devices.size(); i++)
-    {    
-        computer.compute(i);    
+    //for(int i =0; i<computer.devices.size(); i++)
+    //{    
+    //    computer.compute(i);    
         //computer.printResult();
 
-        delete [] matrixResultGPU;
-        matrixResultGPU = computer.getResult();
-        CheckDifference();
-    }
+    //    delete [] matrixResultGPU;
+    //    matrixResultGPU = computer.getResult();
+    //    CheckDifference();
+    //}
+	
+	computer.compute(0, 1);
+	computer.printResult();
+	delete[] matrixResultGPU;
+	//matrixResultGPU = computer.getResult();
+	//CheckDifference();
 	system("pause");
     return 0;
 }
