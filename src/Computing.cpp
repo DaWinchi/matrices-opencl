@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <chrono>
 
 Computing::Computing()
 {
@@ -110,17 +111,16 @@ void Computing::compute(int numDevice)
     kernel.setArg(4, vector2);
     kernel.setArg(5, vectorOut);
 
-    clock_t startTime = 0, endTime = 0;
     std::cout<<"Computing..............";
-    startTime = clock();
+	auto startTime = std::chrono::steady_clock::now();
     comqueque.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sizeRes.r, sizeRes.c));
     comqueque.flush();
-    endTime = clock();
+	auto endTime = std::chrono::steady_clock::now();
 
     std::cout<<"OK\n";
-     
-    double time = (double)(endTime - startTime)/CLOCKS_PER_SEC*1000;
-    std::cout<<"Time: "<<time<<" ms"<<std::endl;
+    
+	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    std::cout<<"Time: "<<time.count()<<" ms"<<std::endl;
 
     comqueque.enqueueReadBuffer(vectorOut, CL_TRUE, 0, sizeRes.r*sizeRes.c*sizeof(int),_matrixResult);
 }
@@ -218,19 +218,17 @@ void Computing::compute(int numDevice1, int numDevice2)
 	kernel2.setArg(4, vector2Down);
 	kernel2.setArg(5, vectorOutDown);
 
-	clock_t startTime = 0, endTime = 0;
 	std::cout << "Computing..............";
-	startTime = clock();
+	auto startTime = std::chrono::steady_clock::now();
 	comqueque1.enqueueNDRangeKernel(kernel1, cl::NullRange, cl::NDRange(_sizeResultUp.r, _sizeResultUp.c));
 	comqueque2.enqueueNDRangeKernel(kernel2, cl::NullRange, cl::NDRange(_sizeResultDown.r, _sizeResultDown.c));
 	comqueque1.flush();
 	comqueque2.flush();
-	endTime = clock();
+	auto endTime = std::chrono::steady_clock::now();
 
 	std::cout << "OK\n";
-
-	double time = (double)(endTime - startTime) / CLOCKS_PER_SEC * 1000;
-	std::cout << "Time: " << time << " ms" << std::endl;
+	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+	std::cout << "Time: " << time.count() << " ms" << std::endl;
 
 	comqueque1.enqueueReadBuffer(vectorOutUp, CL_TRUE, 0, _sizeResultUp.r*_sizeResultUp.c * sizeof(int), _matrixResultUp);
 	comqueque2.enqueueReadBuffer(vectorOutDown, CL_TRUE, 0, _sizeResultDown.r*_sizeResultDown.c * sizeof(int), _matrixResultDown);

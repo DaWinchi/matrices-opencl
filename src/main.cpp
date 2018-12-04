@@ -1,6 +1,7 @@
 #include "../inc/Computing.h"
 #include <ctime>
 #include <iostream>
+#include <chrono>
 
 const int NROWS1 = 3000;
 const int NCOLS1 = 3000;
@@ -84,11 +85,10 @@ void printResult()
 void ComputingOnHost()
 {
 	std::cout << "-----------------Host-----------------\n";
-	clock_t startTime, endTime;
 
 	std::cout << "Computing..............";
 
-	startTime = clock();
+	auto startTime = std::chrono::steady_clock::now();
 	int i = 0, j = 0, k = 0;
 #pragma omp parallel for shared(matrix1,matrix2,matrixResultCPU) private(i,j,k)
 	for (i = 0; i < NROWS1; i++)
@@ -103,11 +103,11 @@ void ComputingOnHost()
 			matrixResultCPU[i][j] = sum;
 		}
 	}
-	endTime = clock();
+	auto endTime = std::chrono::steady_clock::now();
 
 	std::cout << "OK\n";
-	double time = (double)(endTime - startTime) / CLOCKS_PER_SEC * 1000;
-	std::cout << "Time: " << time << " ms" << std::endl;
+	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+	std::cout << "Time: " << time.count() << " ms" << std::endl;
 
 }
 
