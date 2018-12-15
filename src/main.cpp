@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 
-const int NROWS1 = 3000;
+const int NROWS1 = 6000;
 const int NCOLS1 = 3000;
 const int NROWS2 = 3000;
 const int NCOLS2 = 3000;

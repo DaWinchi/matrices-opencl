@@ -114,7 +114,7 @@ void Computing::compute(int numDevice)
     std::cout<<"Computing..............";
 	auto startTime = std::chrono::steady_clock::now();
     comqueque.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sizeRes.r, sizeRes.c));
-    comqueque.flush();
+    comqueque.finish();
 	auto endTime = std::chrono::steady_clock::now();
 
     std::cout<<"OK\n";
@@ -222,8 +222,8 @@ void Computing::compute(int numDevice1, int numDevice2)
 	auto startTime = std::chrono::steady_clock::now();
 	comqueque1.enqueueNDRangeKernel(kernel1, cl::NullRange, cl::NDRange(_sizeResultUp.r, _sizeResultUp.c));
 	comqueque2.enqueueNDRangeKernel(kernel2, cl::NullRange, cl::NDRange(_sizeResultDown.r, _sizeResultDown.c));
-	comqueque1.flush();
-	comqueque2.flush();
+	comqueque1.finish();
+	comqueque2.finish();
 	auto endTime = std::chrono::steady_clock::now();
 
 	std::cout << "OK\n";
