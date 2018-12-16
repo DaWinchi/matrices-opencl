@@ -235,7 +235,7 @@ void Computing::compute(int numDevice1, int numDevice2)
 	setResultFromSubResult();
 }
 
-void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult, 
+void Computing::setData(TYPE **pMatr1, TYPE **pMatr2, TYPE **pMatrResult,
                         int nRows1, int nCols1, int nRows2, int nCols2)
 {
     sizeM1.r = nRows1;
@@ -249,9 +249,9 @@ void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult,
 	delete[] _matrix2;
 	delete[] _matrixResult;
 
-    _matrix1 = new int [sizeM1.r*sizeM1.c];
-    _matrix2 = new int [sizeM2.r*sizeM2.c];
-    _matrixResult = new int [sizeRes.r*sizeRes.c];
+    _matrix1 = new TYPE[sizeM1.r*sizeM1.c];
+    _matrix2 = new TYPE[sizeM2.r*sizeM2.c];
+    _matrixResult = new TYPE[sizeRes.r*sizeRes.c];
 
     for (int i = 0; i < sizeM1.r; i++)
     {
@@ -281,7 +281,7 @@ void Computing::setData(int **pMatr1, int **pMatr2, int **pMatrResult,
 
 }
 
-void Computing::setSubData(int **pMatr1, int **pMatrResult,  int nRows1, int nCols1, int nRows2, int nCols2)
+void Computing::setSubData(TYPE **pMatr1, TYPE **pMatrResult,  int nRows1, int nCols1, int nRows2, int nCols2)
 {
 	/**Initialize sizes up and down left submatrix*/
 	_sizeM1Up.r = _labelDevide;
@@ -301,11 +301,11 @@ void Computing::setSubData(int **pMatr1, int **pMatrResult,  int nRows1, int nCo
 	delete[] _matrixResultUp;
 	delete[] _matrixResultDown;
 
-	_matrix1Up = new int[_sizeM1Up.r*_sizeM1Up.c];
-	_matrix1Down = new int[_sizeM1Down.r*_sizeM1Down.c];
+	_matrix1Up = new TYPE[_sizeM1Up.r*_sizeM1Up.c];
+	_matrix1Down = new TYPE[_sizeM1Down.r*_sizeM1Down.c];
 
-	_matrixResultUp = new int[_sizeResultUp.c*_sizeResultUp.r];
-	_matrixResultDown = new int[_sizeResultDown.c*_sizeResultDown.r];
+	_matrixResultUp = new TYPE[_sizeResultUp.c*_sizeResultUp.r];
+	_matrixResultDown = new TYPE[_sizeResultDown.c*_sizeResultDown.r];
 
 
 	/**Initialize up submatrix matrix1*/
@@ -350,7 +350,7 @@ void Computing::printData()
     std::cout<<std::endl<<"Matrix 1:\n";
     for (int i = 0; i < sizeM1.r*sizeM1.c; i++ )
     {
-        printf("%3i", _matrix1[i]);
+        printf("%5.2f", _matrix1[i]);
         if(i % sizeM1.c == (sizeM1.c-1))
         {
             std::cout<<std::endl;
@@ -360,7 +360,7 @@ void Computing::printData()
 	std::cout << std::endl << "Matrix 1 Up:\n";
 	for (int i = 0; i < _sizeM1Up.r*_sizeM1Up.c; i++)
 	{
-		printf("%3i", _matrix1Up[i]);
+		printf("%5.2f", _matrix1Up[i]);
 		if (i % _sizeM1Up.c == (_sizeM1Up.c - 1))
 		{
 			std::cout << std::endl;
@@ -370,7 +370,7 @@ void Computing::printData()
 	std::cout << std::endl << "Matrix 1 Down:\n";
 	for (int i = 0; i < _sizeM1Down.r*_sizeM1Down.c; i++)
 	{
-		printf("%3i", _matrix1Down[i]);
+		printf("%5.2f", _matrix1Down[i]);
 		if (i % _sizeM1Down.c == (_sizeM1Down.c - 1))
 		{
 			std::cout << std::endl;
@@ -380,7 +380,7 @@ void Computing::printData()
     std::cout<<std::endl<<"Matrix 2:\n";
     for (int i = 0; i < sizeM2.r*sizeM2.c; i++ )
     {
-        printf("%3i", _matrix2[i]);
+        printf("%5.2f", _matrix2[i]);
         if(i % sizeM2.c == (sizeM2.c-1))
         {
             std::cout<<std::endl;
@@ -410,7 +410,7 @@ void Computing::printResult()
     std::cout<<std::endl<<"Result:\n";
     for (int i = 0; i < sizeRes.r*sizeRes.c; i++ )
     {
-        printf("%5i", _matrixResult[i]);
+        printf("%8.2f", _matrixResult[i]);
         if(i % sizeRes.c == (sizeRes.c-1))
         {
             std::cout<<std::endl;
@@ -420,7 +420,7 @@ void Computing::printResult()
 	std::cout << std::endl << "Result Up:\n";
 	for (int i = 0; i < _sizeResultUp.r*_sizeResultUp.c; i++)
 	{
-		printf("%5i", _matrixResultUp[i]);
+		printf("%8.2f", _matrixResultUp[i]);
 		if (i % _sizeResultUp.c == (_sizeResultUp.c - 1))
 		{
 			std::cout << std::endl;
@@ -430,7 +430,7 @@ void Computing::printResult()
 	std::cout << std::endl << "Result Down:\n";
 	for (int i = 0; i < _sizeResultDown.r*_sizeResultDown.c; i++)
 	{
-		printf("%5i", _matrixResultDown[i]);
+		printf("%8.2f", _matrixResultDown[i]);
 		if (i % _sizeResultDown.c == (_sizeResultDown.c - 1))
 		{
 			std::cout << std::endl;
@@ -439,12 +439,12 @@ void Computing::printResult()
 
 }
 
-int ** Computing::getResult()
+TYPE ** Computing::getResult()
 {
-    int **result = new int*[sizeRes.r];
+	TYPE **result = new TYPE*[sizeRes.r];
     for (int r = 0; r < sizeRes.r; r++)
     {
-        result[r] = new int [sizeRes.c];
+        result[r] = new TYPE[sizeRes.c];
     }
 
     for (int r = 0; r < sizeRes.r; r++)

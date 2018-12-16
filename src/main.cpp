@@ -3,40 +3,41 @@
 #include <iostream>
 #include <chrono>
 
-const int NROWS1 = 6000;
-const int NCOLS1 = 3000;
-const int NROWS2 = 3000;
-const int NCOLS2 = 3000;
+typedef float TYPE;
+const int NROWS1 = 2000;
+const int NCOLS1 = 2000;
+const int NROWS2 = 2000;
+const int NCOLS2 = 2000;
 
-int **matrix1;
-int **matrix2;
-int **matrixResultCPU;
-int **matrixResultGPU;
+TYPE **matrix1;
+TYPE **matrix2;
+TYPE **matrixResultCPU;
+TYPE **matrixResultGPU;
 
 void InitializeData()
 {
-	matrix1 = new int*[NROWS1];
+	matrix1 = new TYPE*[NROWS1];
 	for (int i = 0; i < NROWS1; i++)
 	{
-		matrix1[i] = new int[NCOLS1];
+		matrix1[i] = new TYPE[NCOLS1];
 	}
 
-	matrix2 = new int*[NROWS2];
+	matrix2 = new TYPE*[NROWS2];
 	for (int i = 0; i < NROWS2; i++)
 	{
-		matrix2[i] = new int[NCOLS2];
+		matrix2[i] = new TYPE[NCOLS2];
 	}
 
-	matrixResultCPU = new int*[NROWS1];
+	matrixResultCPU = new TYPE*[NROWS1];
 	for (int i = 0; i < NROWS1; i++)
 	{
-		matrixResultCPU[i] = new int[NCOLS2];
+		matrixResultCPU[i] = new TYPE[NCOLS2];
 	}
 
-	matrixResultGPU = new int*[NROWS1];
+	matrixResultGPU = new TYPE*[NROWS1];
 	for (int i = 0; i < NROWS1; i++)
 	{
-		matrixResultGPU[i] = new int[NCOLS2];
+		matrixResultGPU[i] = new TYPE[NCOLS2];
 	}
 
 
@@ -45,7 +46,7 @@ void InitializeData()
 	{
 		for (int j = 0; j < NCOLS1; j++)
 		{
-			matrix1[i][j] = rand() % 10;
+			matrix1[i][j] = (TYPE)(rand())/RAND_MAX*10.0;
 		}
 	}
 
@@ -54,7 +55,7 @@ void InitializeData()
 	{
 		for (int j = 0; j < NCOLS2; j++)
 		{
-			matrix2[i][j] = rand() % 10;
+			matrix2[i][j] = (TYPE)(rand()) / RAND_MAX * 10.0;
 		}
 	}
 
@@ -76,7 +77,7 @@ void printResult()
 	{
 		for (int j = 0; j < NCOLS2; j++)
 		{
-			printf("%6i", matrixResultCPU[i][j]);
+			printf("%7.2f", matrixResultCPU[i][j]);
 		}
 		std::cout << std::endl;
 	}
@@ -95,7 +96,7 @@ void ComputingOnHost()
 	{
 		for (j = 0; j < NCOLS2; j++)
 		{
-			int sum = 0;
+			TYPE sum = 0;
 			for (k = 0; k < NCOLS1; k++)
 			{
 				sum += matrix1[i][k] * matrix2[k][j];
@@ -137,12 +138,11 @@ int main(int argc, char **argv)
 
 	Computing computer;
 	computer.getDevicesInfo();
-
+	
 	while (true)
 	{
-		computer.setBarrier(1500);
+		computer.setBarrier(1000);
 		computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
-
 		int selectedDevice = 0;
 		std::cout << "----------------------------- Single device computing -----------------------------\n";
 		std::cout << "Select device: ";
