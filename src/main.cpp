@@ -4,10 +4,10 @@
 #include <chrono>
 
 typedef float TYPE;
-const int NROWS1 = 2000;
-const int NCOLS1 = 2000;
-const int NROWS2 = 2000;
-const int NCOLS2 = 2000;
+const int NROWS1 = 8192;
+const int NCOLS1 = 16;
+const int NROWS2 = 16;
+const int NCOLS2 = 4096;
 
 TYPE **matrix1;
 TYPE **matrix2;
@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 	
 	while (true)
 	{
-		computer.setBarrier(1000);
+		computer.setBarrier(NROWS1/2);
 		computer.setData(matrix1, matrix2, matrixResultGPU, NROWS1, NCOLS1, NROWS2, NCOLS2);
 		int selectedDevice = 0;
 		std::cout << "----------------------------- Single device computing -----------------------------\n";
