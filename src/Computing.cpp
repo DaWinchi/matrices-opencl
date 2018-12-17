@@ -83,7 +83,45 @@ void Computing::compute(int numDevice)
                         (sizeRes.r*sizeRes.c) * sizeof(TYPE), _matrixResult);
     
 	std::ifstream sourceFile("../src/kernel.cl");
-	std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
+	//std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
+	std::string sourceCode =
+		" #define SIZEK        "+ std::to_string(sizeM1.c) +					   "\r\n"
+		" #define NROWS        " + std::to_string(sizeRes.r) +						"\r\n"
+		" #define NCOLS        " + std::to_string(sizeRes.c) +						"\r\n"
+		" #define REALTYPE4 float4													\r\n"
+		"	typedef float TYPE;														\r\n"
+		"__kernel void compute(														\r\n"
+		"			__global const TYPE *matrix1,									\r\n"
+		"			__global const TYPE *matrix2,									\r\n"
+		"			__global TYPE *matrixOut)										\r\n"
+		"		{																	\r\n"
+		"			int row = get_global_id(0);										\r\n"
+		"			TYPE row_buf[SIZEK];											\r\n"
+		"			for( int c = 0; c < SIZEK; c++)									\r\n"
+		"			{																\r\n"
+		"				row_buf[c] = matrix1[SIZEK*row + c];						\r\n"
+		"			}																\r\n"
+		"			TYPE acc = 0;													\r\n"
+		"			for (int col = 0; col < NCOLS; col++)							\r\n"
+		"			{																\r\n"
+		"				acc = 0;													\r\n"
+		"				for (int k = 0; k < SIZEK; k+=4)								\r\n"
+		"				{															\r\n"
+		"				acc += dot( ( REALTYPE4 ) ( row_buf[ k ],                            \r\n"
+		"											 row_buf[ k + 1 ],                        \r\n"
+		"											 row_buf[ k + 2 ],                        \r\n"
+		"											 row_buf[ k + 3 ] ),                      \r\n"
+		"							 ( REALTYPE4 ) ( matrix2[col * SIZEK + k     ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 1 ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 2 ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 3 ] ) );         \r\n"
+		"				}																		\r\n"
+		"				matrixOut[NCOLS*row + col] = acc;										\r\n"
+		"			}																			\r\n"
+		"		}																				\r\n";
+
+
+
 	cl::Program::Sources source(1, std::make_pair(sourceCode.c_str(), sourceCode.length() + 1));
 	cl::Program program = cl::Program(context, source);
 
@@ -98,18 +136,16 @@ void Computing::compute(int numDevice)
         << "OpenCL compilation error" << std::endl
         << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device[0])
         << std::endl;
+		system("pause");
         //throw err;
     }
     
 
     cl::Kernel kernel(program, "compute");
 
-    kernel.setArg(0, sizeM1.c);
-    kernel.setArg(1, sizeRes.r);
-    kernel.setArg(2, sizeRes.c);
-    kernel.setArg(3, vector1);
-    kernel.setArg(4, vector2);
-    kernel.setArg(5, vectorOut);
+    kernel.setArg(0, vector1);
+    kernel.setArg(1, vector2);
+    kernel.setArg(2, vectorOut);
 
     std::cout<<"Computing..............";
 	auto startTime = std::chrono::steady_clock::now();
@@ -167,10 +203,83 @@ void Computing::compute(int numDevice1, int numDevice2)
 		(_sizeResultDown.r*_sizeResultDown.c) * sizeof(TYPE), _matrixResultDown);
 
 	std::ifstream sourceFile("../src/kernel.cl");
-	std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
-	cl::Program::Sources source(1, std::make_pair(sourceCode.c_str(), sourceCode.length() + 1));
-	cl::Program program1 = cl::Program(context1, source);
-	cl::Program program2 = cl::Program(context2, source);
+	//std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
+	std::string sourceCode1 =
+		" #define SIZEK        " + std::to_string(_sizeM1Up.c) + "\r\n"
+		" #define NROWS        " + std::to_string(_sizeResultUp.r) + "\r\n"
+		" #define NCOLS        " + std::to_string(_sizeResultUp.c) + "\r\n"
+		" #define REALTYPE4 float4													\r\n"
+		"	typedef float TYPE;														\r\n"
+		"__kernel void compute(														\r\n"
+		"			__global const TYPE *matrix1,									\r\n"
+		"			__global const TYPE *matrix2,									\r\n"
+		"			__global TYPE *matrixOut)										\r\n"
+		"		{																	\r\n"
+		"			int row = get_global_id(0);										\r\n"
+		"			TYPE row_buf[SIZEK];											\r\n"
+		"			for( int c = 0; c < SIZEK; c++)									\r\n"
+		"			{																\r\n"
+		"				row_buf[c] = matrix1[SIZEK*row + c];						\r\n"
+		"			}																\r\n"
+		"			TYPE acc = 0;													\r\n"
+		"			for (int col = 0; col < NCOLS; col++)							\r\n"
+		"			{																\r\n"
+		"				acc = 0;													\r\n"
+		"				for (int k = 0; k < SIZEK; k+=4)								\r\n"
+		"				{															\r\n"
+		"				acc += dot( ( REALTYPE4 ) ( row_buf[ k ],                            \r\n"
+		"											 row_buf[ k + 1 ],                        \r\n"
+		"											 row_buf[ k + 2 ],                        \r\n"
+		"											 row_buf[ k + 3 ] ),                      \r\n"
+		"							 ( REALTYPE4 ) ( matrix2[col * SIZEK + k     ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 1 ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 2 ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 3 ] ) );         \r\n"
+		"				}																		\r\n"
+		"				matrixOut[NCOLS*row + col] = acc;										\r\n"
+		"			}																			\r\n"
+		"		}																				\r\n";
+
+	std::string sourceCode2 =
+		" #define SIZEK        " + std::to_string(_sizeM1Down.c) + "\r\n"
+		" #define NROWS        " + std::to_string(_sizeResultDown.r) + "\r\n"
+		" #define NCOLS        " + std::to_string(_sizeResultDown.c) + "\r\n"
+		" #define REALTYPE4 float4													\r\n"
+		"	typedef float TYPE;														\r\n"
+		"__kernel void compute(														\r\n"
+		"			__global const TYPE *matrix1,									\r\n"
+		"			__global const TYPE *matrix2,									\r\n"
+		"			__global TYPE *matrixOut)										\r\n"
+		"		{																	\r\n"
+		"			int row = get_global_id(0);										\r\n"
+		"			TYPE row_buf[SIZEK];											\r\n"
+		"			for( int c = 0; c < SIZEK; c++)									\r\n"
+		"			{																\r\n"
+		"				row_buf[c] = matrix1[SIZEK*row + c];						\r\n"
+		"			}																\r\n"
+		"			TYPE acc = 0;													\r\n"
+		"			for (int col = 0; col < NCOLS; col++)							\r\n"
+		"			{																\r\n"
+		"				acc = 0;													\r\n"
+		"				for (int k = 0; k < SIZEK; k+=4)								\r\n"
+		"				{															\r\n"
+		"				acc += dot( ( REALTYPE4 ) ( row_buf[ k ],                            \r\n"
+		"											 row_buf[ k + 1 ],                        \r\n"
+		"											 row_buf[ k + 2 ],                        \r\n"
+		"											 row_buf[ k + 3 ] ),                      \r\n"
+		"							 ( REALTYPE4 ) ( matrix2[col * SIZEK + k     ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 1 ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 2 ],             \r\n"
+		"											 matrix2[col * SIZEK + k + 3 ] ) );         \r\n"
+		"				}																		\r\n"
+		"				matrixOut[NCOLS*row + col] = acc;										\r\n"
+		"			}																			\r\n"
+		"		}																				\r\n";
+
+	cl::Program::Sources source1(1, std::make_pair(sourceCode1.c_str(), sourceCode1.length() + 1));
+	cl::Program::Sources source2(1, std::make_pair(sourceCode2.c_str(), sourceCode2.length() + 1));
+	cl::Program program1 = cl::Program(context1, source1);
+	cl::Program program2 = cl::Program(context2, source2);
 
 	try
 	{
@@ -183,6 +292,7 @@ void Computing::compute(int numDevice1, int numDevice2)
 			<< "OpenCL compilation error" << std::endl
 			<< program1.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device1[0])
 			<< std::endl;
+		system("pause");
 		//throw err;
 	}
 
@@ -197,26 +307,20 @@ void Computing::compute(int numDevice1, int numDevice2)
 			<< "OpenCL compilation error" << std::endl
 			<< program2.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device2[0])
 			<< std::endl;
-		//throw err;
+		system("pause");
 	}
 
 
 	cl::Kernel kernel1(program1, "compute");
 	cl::Kernel kernel2(program2, "compute");
 
-	kernel1.setArg(0, _sizeM1Up.c);
-	kernel1.setArg(1, _sizeResultUp.r);
-	kernel1.setArg(2, _sizeResultUp.c);
-	kernel1.setArg(3, vector1Up);
-	kernel1.setArg(4, vector2Up);
-	kernel1.setArg(5, vectorOutUp);
+	kernel1.setArg(0, vector1Up);
+	kernel1.setArg(1, vector2Up);
+	kernel1.setArg(2, vectorOutUp);
 
-	kernel2.setArg(0, _sizeM1Down.c);
-	kernel2.setArg(1, _sizeResultDown.r);
-	kernel2.setArg(2, _sizeResultDown.c);
-	kernel2.setArg(3, vector1Down);
-	kernel2.setArg(4, vector2Down);
-	kernel2.setArg(5, vectorOutDown);
+	kernel2.setArg(0, vector1Down);
+	kernel2.setArg(1, vector2Down);
+	kernel2.setArg(2, vectorOutDown);
 
 	std::cout << "Computing..............";
 	auto startTime = std::chrono::steady_clock::now();
