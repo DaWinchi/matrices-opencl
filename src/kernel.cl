@@ -8,12 +8,15 @@ __kernel void compute(
                 __global TYPE *matrixOut)
 {
     int row = get_global_id(0);
-    int col = get_global_id(1);
 
     TYPE acc = 0;
-    for(int k = 0; k < sizeK; k++)
-    {
-        acc+= matrix1[sizeK*row + k]* matrix2[sizeK*col + k];
-    }    
-    matrixOut[nCols*row + col] = acc;
+	for (int col = 0; col < nCols; col++)
+	{ 
+		acc = 0;
+		for(int k = 0; k < sizeK; k++)
+		{
+		    acc+= matrix1[sizeK*row + k]* matrix2[sizeK*col + k];
+		}    
+		matrixOut[nCols*row + col] = acc;
+	}
 }

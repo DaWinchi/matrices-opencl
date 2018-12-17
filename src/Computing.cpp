@@ -74,13 +74,13 @@ void Computing::compute(int numDevice)
 
     cl::Buffer vector1 = cl::Buffer(context, 
                         CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
-                        (sizeM1.r*sizeM1.c) * sizeof(int), _matrix1);
+                        (sizeM1.r*sizeM1.c) * sizeof(TYPE), _matrix1);
 	cl::Buffer vector2 = cl::Buffer(context,
                         CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
-                        (sizeM2.r*sizeM2.c) * sizeof(int), _matrix2);
+                        (sizeM2.r*sizeM2.c) * sizeof(TYPE), _matrix2);
 	cl::Buffer vectorOut = cl::Buffer(context, 
                         CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
-                        (sizeRes.r*sizeRes.c) * sizeof(int), _matrixResult);
+                        (sizeRes.r*sizeRes.c) * sizeof(TYPE), _matrixResult);
     
 	std::ifstream sourceFile("../src/kernel.cl");
 	std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
@@ -113,7 +113,7 @@ void Computing::compute(int numDevice)
 
     std::cout<<"Computing..............";
 	auto startTime = std::chrono::steady_clock::now();
-    comqueque.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sizeRes.r, sizeRes.c));
+    comqueque.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sizeRes.r));
     comqueque.finish();
 	auto endTime = std::chrono::steady_clock::now();
 
@@ -122,7 +122,7 @@ void Computing::compute(int numDevice)
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout<<"Time: "<<time.count()<<" ms"<<std::endl;
 
-    comqueque.enqueueReadBuffer(vectorOut, CL_TRUE, 0, sizeRes.r*sizeRes.c*sizeof(int),_matrixResult);
+    comqueque.enqueueReadBuffer(vectorOut, CL_TRUE, 0, sizeRes.r*sizeRes.c*sizeof(TYPE),_matrixResult);
 }
 
 void Computing::compute(int numDevice1, int numDevice2)
@@ -148,23 +148,23 @@ void Computing::compute(int numDevice1, int numDevice2)
 
 	cl::Buffer vector1Up = cl::Buffer(context1,
 		CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		(_sizeM1Up.r*_sizeM1Up.c) * sizeof(int), _matrix1Up);
+		(_sizeM1Up.r*_sizeM1Up.c) * sizeof(TYPE), _matrix1Up);
 	cl::Buffer vector2Up = cl::Buffer(context1,
 		CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		(sizeM2.r*sizeM2.c) * sizeof(int), _matrix2);
+		(sizeM2.r*sizeM2.c) * sizeof(TYPE), _matrix2);
 	cl::Buffer vectorOutUp = cl::Buffer(context1,
 		CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		(_sizeResultUp.r*_sizeResultUp.c) * sizeof(int), _matrixResultUp);
+		(_sizeResultUp.r*_sizeResultUp.c) * sizeof(TYPE), _matrixResultUp);
 
 	cl::Buffer vector1Down = cl::Buffer(context2,
 		CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		(_sizeM1Down.r*_sizeM1Down.c) * sizeof(int), _matrix1Down);
+		(_sizeM1Down.r*_sizeM1Down.c) * sizeof(TYPE), _matrix1Down);
 	cl::Buffer vector2Down = cl::Buffer(context2,
 		CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		(sizeM2.r*sizeM2.c) * sizeof(int), _matrix2);
+		(sizeM2.r*sizeM2.c) * sizeof(TYPE), _matrix2);
 	cl::Buffer vectorOutDown = cl::Buffer(context2,
 		CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		(_sizeResultDown.r*_sizeResultDown.c) * sizeof(int), _matrixResultDown);
+		(_sizeResultDown.r*_sizeResultDown.c) * sizeof(TYPE), _matrixResultDown);
 
 	std::ifstream sourceFile("../src/kernel.cl");
 	std::string sourceCode(std::istreambuf_iterator<char>(sourceFile), (std::istreambuf_iterator<char>()));
@@ -220,8 +220,8 @@ void Computing::compute(int numDevice1, int numDevice2)
 
 	std::cout << "Computing..............";
 	auto startTime = std::chrono::steady_clock::now();
-	comqueque1.enqueueNDRangeKernel(kernel1, cl::NullRange, cl::NDRange(_sizeResultUp.r, _sizeResultUp.c));
-	comqueque2.enqueueNDRangeKernel(kernel2, cl::NullRange, cl::NDRange(_sizeResultDown.r, _sizeResultDown.c));
+	comqueque1.enqueueNDRangeKernel(kernel1, cl::NullRange, cl::NDRange(_sizeResultUp.r));
+	comqueque2.enqueueNDRangeKernel(kernel2, cl::NullRange, cl::NDRange(_sizeResultDown.r));
 	comqueque1.finish();
 	comqueque2.finish();
 	auto endTime = std::chrono::steady_clock::now();
@@ -230,8 +230,8 @@ void Computing::compute(int numDevice1, int numDevice2)
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
 	std::cout << "Time: " << time.count() << " ms" << std::endl;
 
-	comqueque1.enqueueReadBuffer(vectorOutUp, CL_TRUE, 0, _sizeResultUp.r*_sizeResultUp.c * sizeof(int), _matrixResultUp);
-	comqueque2.enqueueReadBuffer(vectorOutDown, CL_TRUE, 0, _sizeResultDown.r*_sizeResultDown.c * sizeof(int), _matrixResultDown);
+	comqueque1.enqueueReadBuffer(vectorOutUp, CL_TRUE, 0, _sizeResultUp.r*_sizeResultUp.c * sizeof(TYPE), _matrixResultUp);
+	comqueque2.enqueueReadBuffer(vectorOutDown, CL_TRUE, 0, _sizeResultDown.r*_sizeResultDown.c * sizeof(TYPE), _matrixResultDown);
 	setResultFromSubResult();
 }
 
