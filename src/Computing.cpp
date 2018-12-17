@@ -265,7 +265,7 @@ void Computing::setData(TYPE **pMatr1, TYPE **pMatr2, TYPE **pMatrResult,
     {
         for (int j = 0; j< sizeM2.c; j++)
         {
-            _matrix2[i*sizeM2.c + j] = pMatr2[i][j];
+            _matrix2[j*sizeM2.r + i] = pMatr2[i][j];
         }
     }
 
@@ -280,6 +280,7 @@ void Computing::setData(TYPE **pMatr1, TYPE **pMatr2, TYPE **pMatrResult,
 	setSubData(pMatr1, pMatrResult, nRows1, nCols1, nRows2, nCols2);
 
 }
+
 
 void Computing::setSubData(TYPE **pMatr1, TYPE **pMatrResult,  int nRows1, int nCols1, int nRows2, int nCols2)
 {

@@ -13,7 +13,7 @@ __kernel void compute(
     TYPE acc = 0;
     for(int k = 0; k < sizeK; k++)
     {
-        acc+= matrix1[sizeK*row + k]* matrix2[k*nCols + col];
+        acc+= matrix1[sizeK*row + k]* matrix2[sizeK*col + k];
     }    
     matrixOut[nCols*row + col] = acc;
 }
