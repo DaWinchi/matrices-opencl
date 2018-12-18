@@ -4,10 +4,10 @@
 #include <chrono>
 
 typedef float TYPE;
-const int NROWS1 = 2000;
-const int NCOLS1 = 2000;
-const int NROWS2 = 2000;
-const int NCOLS2 = 2000;
+const int NROWS1 = 5000;
+const int NCOLS1 = 5000;
+const int NROWS2 = 5000;
+const int NCOLS2 = 5000;
 
 TYPE **matrix1;
 TYPE **matrix2;
